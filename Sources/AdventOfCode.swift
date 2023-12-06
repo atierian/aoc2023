@@ -3,9 +3,8 @@ import Foundation
 
 // Add each new day implementation to this array:
 let allChallenges: [any AdventDay] = [
-	Day03(),
 	Day04(),
-  Day05()
+    Day05()
 ]
 
 @main

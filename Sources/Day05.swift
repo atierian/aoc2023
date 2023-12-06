@@ -1,3 +1,6 @@
+import Algorithms
+import Foundation
+
 struct Day05: AdventDay {
   var input: String
   
@@ -5,60 +8,74 @@ struct Day05: AdventDay {
     let splits = input.split(separator: "\n\n")
     let seeds = splits[0].split(separator: ": ")[1].ints(split: .whitespaces)
     let stages = stages(from: splits)
-    return closestLocation(seeds: seeds, stages: stages)
-  }
 
-  func part2() -> Int {
-    let splits = input.split(separator: "\n\n")
-    let seeds = splits[0].split(separator: ": ")[1].ints(split: .whitespaces)
-      .chunks(ofCount: 2)
-      .map(Array.init)
-      .flatMap { chunk in
-        Array(chunk[0]...(chunk[0] + chunk[1] - 1))
-      }
-    
-    let stages = stages(from: splits)
-    return closestLocation(seeds: seeds, stages: stages)
-  }
-  
-  struct Stage {
-    let sourceRange: ClosedRange<Int>
-    let destinationRange: ClosedRange<Int>
-  }
-  
-  private func stagesForSection(_ section: String.SubSequence) -> [Stage] {
-    section.split(separator: "\n")
-      .dropFirst()
-      .map { $0.ints(split: .whitespaces) }
-      .map { line in
-        Stage(
-          sourceRange: line[1]...(line[1] + line[2] - 1),
-          destinationRange: line[0]...(line[0] + line[2] - 1)
-        )
-    }
-  }
-
-  private func destination(from source: Int, stages: [Stage]) -> Int {
-    stages
-      .first(where: { $0.sourceRange.contains(source) })
-      .map {
-        $0.destinationRange.lowerBound - $0.sourceRange.lowerBound + source
-      } ?? source
-  }
-  
-  private func stages(from input: [String.SubSequence]) -> [[Stage]] {
-    input.dropFirst().map(stagesForSection(_:))
-  }
-  
-  private func closestLocation(seeds: [Int], stages: [[Stage]]) -> Int {
     var closestLocation = Int.max
     for seed in seeds {
       var location = seed
-      for stage in stages {
-        location = destination(from: location, stages: stage)
+      for mapping in stages {
+        location = mapping
+          .first(where: { $0.source.contains(location) })
+          .map {
+            $0.destination.lowerBound - $0.source.lowerBound + location
+          } ?? location
       }
       closestLocation = min(closestLocation, location)
     }
     return closestLocation
+  }
+
+  func part2() -> Int {
+    let sections = input.split(separator: "\n\n")
+    let stages = stages(from: sections)
+
+    var source = sections[0].split(separator: ": ")[1]
+      .ints(split: .whitespaces)
+      .chunks(ofCount: 2)
+      .map(Array.init)
+      .compactMap { chunk in
+        chunk[0]..<(chunk[0] + chunk[1])
+      }
+      .reduce(into: IndexSet()) { indexSet, range in
+        indexSet.insert(integersIn: range)
+      }
+
+    var destination = IndexSet()
+    for stage in stages {
+      for map in stage {
+        let sourceRanges = IndexSet(integersIn: map.source).intersection(source).rangeView
+        for sourceRange in sourceRanges {
+          destination.insert(integersIn: map.destination(basedOn: sourceRange))
+          source.remove(integersIn: sourceRange)
+        }
+      }
+      source.formUnion(destination)
+      destination.removeAll()
+    }
+
+    return source.rangeView.map(\.lowerBound).min()!
+  }
+
+  struct Mapping {
+    let source: Range<Int>
+    let destination: Range<Int>
+
+    init(_ map: [Int]) {
+      source = map[1]..<(map[1] + map[2])
+      destination = map[0]..<(map[0] + map[2])
+    }
+
+    func destination(basedOn sourceRange: Range<Int>) -> Range<Int> {
+      let offset = source.lowerBound - destination.lowerBound
+      return (sourceRange.lowerBound - offset)..<(sourceRange.upperBound - offset)
+    }
+  }
+  
+  private func stages(from input: [String.SubSequence]) -> [[Mapping]] {
+    input.dropFirst().map {
+      $0.split(separator: "\n")
+        .dropFirst()
+        .map { $0.ints(split: .whitespaces) }
+        .map(Mapping.init)
+    }
   }
 }
