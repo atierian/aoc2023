@@ -10,9 +10,9 @@ struct Day06: AdventDay {
 
   func part2() -> Int {
     let lines = input.lines
-      .map { [Double(String($0.filter(\.isNumber)))!] }
+      .flatMap { [Double(String($0.filter(\.isNumber)))!] }
 
-    return zip(lines[0], lines[1]).map(quadratic).product
+    return quadratic(a: lines[0], b: lines[1])
   }
 
   private func quadratic(a: Double, b: Double) -> Int {
