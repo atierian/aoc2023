@@ -1,7 +1,7 @@
 @_exported import Algorithms
 @_exported import Collections
 @_exported import AOCCore
-import Foundation
+@_exported import Foundation
 
 protocol AdventDay {
   associatedtype Part1Result
