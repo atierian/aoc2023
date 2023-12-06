@@ -39,8 +39,8 @@ struct Day05: AdventDay {
         indexSet.insert(integersIn: range)
       }
 
-    var destination = IndexSet()
     for stage in stages {
+      var destination = IndexSet()
       for map in stage {
         let sourceRanges = IndexSet(integersIn: map.source).intersection(source).rangeView
         for sourceRange in sourceRanges {
@@ -49,7 +49,6 @@ struct Day05: AdventDay {
         }
       }
       source.formUnion(destination)
-      destination.removeAll()
     }
 
     return source.rangeView.map(\.lowerBound).min()!
