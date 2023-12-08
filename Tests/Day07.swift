@@ -1,5 +1,5 @@
 import XCTest
-@testable import AdventOfCode
+@testable import aoc
 
 final class Day07Tests: XCTestCase {
   let testInput = """
