@@ -1,6 +1,6 @@
 @_exported import Algorithms
 @_exported import Collections
-@_exported import AOCCore
+@_exported import AdventKit
 @_exported import Foundation
 
 protocol AdventDay {

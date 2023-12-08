@@ -1,6 +1,3 @@
-import Algorithms
-import Foundation
-
 struct Day05: AdventDay {
   var input: String
   

@@ -6,7 +6,8 @@ let allChallenges: [any AdventDay] = [
 	Day04(),
   Day05(),
   Day06(),
-  Day07()
+  Day07(),
+  Day08()
 ]
 
 @main
@@ -71,33 +72,22 @@ struct AdventOfCode: AsyncParsableCommand {
   }
 }
 
-let timeFormatter: NumberFormatter = {
-    let f = NumberFormatter()
-    f.maximumFractionDigits = 3
-    return f
-}()
+extension FormatStyle where Self == Duration.UnitsFormatStyle {
+  static var precise: Self {
+    .units(
+      allowed: [.seconds, .milliseconds, .microseconds, .nanoseconds],
+      width: .narrow,
+      maximumUnitCount: 1,
+      fractionalPart: .init(
+        lengthLimits: 0...5,
+        roundingRule: .toNearestOrAwayFromZero
+      )
+    )
+  }
+}
 
 extension String.StringInterpolation {
   mutating func appendInterpolation(time: Duration) {
-    var time = Double(time.components.seconds) + (Double(time.components.attoseconds) / 1.0e18)
-
-    let unit: String
-    if time > 1.0 {
-      unit = "s"
-    } else if time > 0.001 {
-      unit = "ms"
-      time *= 1_000
-    } else if time > 0.000_001 {
-      unit = "µs"
-      time *= 1_000_000
-    } else {
-      unit = "ns"
-      time *= 1_000_000_000
-    }
-    let string = timeFormatter.string(
-      from: NSNumber(value: time)
-    )! + unit
-    
-    appendLiteral(string)
+    appendLiteral(time.formatted(.precise))
   }
 }
