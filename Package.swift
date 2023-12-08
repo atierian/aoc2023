@@ -5,7 +5,7 @@ let dependencies: [Target.Dependency] = [
     .product(name: "Algorithms", package: "swift-algorithms"),
     .product(name: "Collections", package: "swift-collections"),
     .product(name: "ArgumentParser", package: "swift-argument-parser"),
-    .product(name: "AOCCore", package: "AOCCore")
+    .product(name: "AdventKit", package: "AdventKit")
 ]
 
 let package = Package(
@@ -28,17 +28,17 @@ let package = Package(
             url: "https://github.com/apple/swift-format.git",
             .upToNextMajor(from: "509.0.0")
         ),
-        .package(path: "AOCCore")
+        .package(path: "AdventKit")
     ],
     targets: [
         .executableTarget(
-            name: "AdventOfCode",
+            name: "aoc",
             dependencies: dependencies,
             resources: [.copy("Data")]
         ),
         .testTarget(
             name: "AdventOfCodeTests",
-            dependencies: ["AdventOfCode"] + dependencies
+            dependencies: ["aoc"] + dependencies
         )
     ]
 )
